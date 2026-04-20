@@ -1,4 +1,4 @@
-name: Space_V4_Final_Fix
+name: Build_SpaceXit_V4_Completo
 on: [push, workflow_dispatch]
 jobs:
   build:
@@ -6,30 +6,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup Theos
+      - name: Instalar Ferramentas de Pacote (O QUE FALTAVA)
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential git lua5.3 liblua5.3-dev
+          # O dpkg e o ldid são essenciais para gerar o arquivo .deb
+          sudo apt-get install -y build-essential git lua5.3 liblua5.3-dev dpkg-dev
+          # Baixando o ldid oficial para assinar a dylib
+          sudo curl -L https://github.com/theos/ldid/releases/latest/download/ldid_linux_x86_64 -o /usr/local/bin/ldid
+          sudo chmod +x /usr/local/bin/ldid
+
+      - name: Setup Theos
+        run: |
           git clone --recursive https://github.com/theos/theos.git ~/theos
 
       - name: Clonar SDK (Bypass 295k)
         run: |
-          # Em vez de curl/tar, usamos o Git Clone que o GitHub não bloqueia
           mkdir -p ~/theos/sdks
           git clone --depth 1 https://github.com/theos/sdks.git ~/temp_sdks
           cp -r ~/temp_sdks/iPhoneOS14.5.sdk ~/theos/sdks/
           rm -rf ~/temp_sdks
 
-      - name: Build Space Xit V4
+      - name: Compilar V4 Final
         run: |
           export THEOS=~/theos
           export PATH=$THEOS/bin:$PATH
-          # Limpeza de caracteres do Windows (Anti-Erro 25)
+          # Garante que o script ignore erros bobos de texto
           find . -type f -exec sed -i 's/\r$//' {} +
           make clean package FINALPACKAGE=1
 
-      - name: Upload da V4
+      - name: Entrega do Produto
         uses: actions/upload-artifact@v4
         with:
-          name: SpaceXit_V4_Final
+          name: SpaceXit_V4_Pronta
           path: packages/*.deb
