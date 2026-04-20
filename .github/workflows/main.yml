@@ -1,4 +1,4 @@
-name: Build_SpaceXit_V4
+name: Build_SpaceXit_V4_Final
 on:
   push:
     branches: [ main ]
@@ -15,11 +15,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential git lua5.3 liblua5.3-dev
           git clone --recursive https://github.com/theos/theos.git ~/theos
-          curl -kL "https://github.com/theos/sdks/raw/master/iPhoneOS14.5.sdk.tar.xz" -o ~/sdk.tar.xz
+
+      - name: Baixar SDK (Sem Erro 295k)
+        run: |
           mkdir -p ~/theos/sdks
+          # Usando link direto do repositório oficial para evitar bloqueio
+          curl -kL "https://github.com/theos/sdks/raw/master/iPhoneOS14.5.sdk.tar.xz" -o ~/sdk.tar.xz
+          # Verifica se o arquivo tem tamanho real (maior que 1MB) antes de extrair
+          if [ $(stat -c%s ~/sdk.tar.xz) -lt 1000000 ]; then echo "Erro: SDK corrompido (295k)!"; exit 1; fi
           tar -xf ~/sdk.tar.xz -C ~/theos/sdks/
 
-      - name: Compile
+      - name: Compile Space Xit
         run: |
           export THEOS=~/theos
           export PATH=$THEOS/bin:$PATH
@@ -27,7 +33,7 @@ jobs:
           make clean
           make package FINALPACKAGE=1
 
-      - name: Upload Artifact
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: SpaceXit_V4_Release
