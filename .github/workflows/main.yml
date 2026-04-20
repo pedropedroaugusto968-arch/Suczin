@@ -10,20 +10,21 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential git lua5.3 liblua5.3-dev dpkg-dev
-          # Baixando ldid direto do binário oficial (Resolve o erro do seu print)
+          # Baixando ldid direto para evitar erro de pacote não encontrado
           sudo curl -L https://github.com/theos/ldid/releases/latest/download/ldid_linux_x86_64 -o /usr/local/bin/ldid
           sudo chmod +x /usr/local/bin/ldid
 
-      - name: Setup Theos e PATH
+      - name: Setup Theos e PATH (O que seu amigo indicou)
         run: |
           git clone --recursive https://github.com/theos/theos.git ~/theos
+          # Isso ensina o sistema onde estão o clang e o logos:
           echo "THEOS=$HOME/theos" >> $GITHUB_ENV
           echo "$HOME/theos/bin" >> $GITHUB_PATH
 
-      - name: Clonar SDK (Adeus 295k)
+      - name: Clonar SDK (Adeus Erro 295k)
         run: |
           mkdir -p ~/theos/sdks
-          # Clonar é mais seguro que baixar via curl/tar
+          # Usar git clone é a única forma de fugir do erro de 295k do curl
           git clone --depth 1 https://github.com/theos/sdks.git ~/temp_sdks
           cp -r ~/temp_sdks/iPhoneOS14.5.sdk ~/theos/sdks/
           rm -rf ~/temp_sdks
