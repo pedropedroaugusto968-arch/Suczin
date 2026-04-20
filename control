@@ -1,9 +1,9 @@
-Package: com.spacexit.v4final
-Name: Space Xit V4
+Package: com.spacexit.v4.final.safe
+Name: Space Xit V4 VIP
 Depends: mobilesubstrate
-Version: 4.0
+Version: 4.0.0
 Architecture: iphoneos-arm
-Description: Menu VIP Final
-Maintainer: Gomes
-Author: Gomes
+Description: Painel FFH4X Anti-Crash Login e Full Bypass
+Maintainer: Gomes (@eoo_gomes3)
+Author: Space Xit
 
