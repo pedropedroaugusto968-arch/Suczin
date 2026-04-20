@@ -13,18 +13,19 @@ jobs:
       - name: Checkout Código
         uses: actions/checkout@v4
 
-      - name: Preparar Ambiente
+      - name: Instalar Theos e SDK
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential git lua5.3 liblua5.3-dev libarchive-dev python3
+          # Instalando Theos
           git clone --recursive https://github.com/theos/theos.git ~/theos
+          # Baixando apenas o SDK 14.5 (Leve e Rápido)
+          mkdir -p ~/theos/sdks
+          git clone --depth 1 https://github.com/theos/sdks.git ~/temp_sdks
+          mv ~/temp_sdks/iPhoneOS14.5.sdk ~/theos/sdks/
+          rm -rf ~/temp_sdks
 
-      - name: Instalar SDK (Método Clone - Sem Erro de Tar)
-        run: |
-          # Clonando o SDK direto para evitar erro de descompactação
-          git clone --depth 1 https://github.com/theos/sdks.git ~/theos/sdks
-
-      - name: Limpar Arquivos (Anti-Erro de Formato)
+      - name: Limpar Formato (Anti-Erro 25)
         run: |
           find . -type f -exec sed -i 's/\r$//' {} +
           echo "" >> control
