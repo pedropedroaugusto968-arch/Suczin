@@ -1,40 +1,42 @@
-name: Space_V4_Build_Final
+name: Space_V4_Blindado
 on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Instalar Dependencias
+
+      - name: Oficina Space Xit (Sem Bloqueio)
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential git lua5.3 liblua5.3-dev dpkg-dev
-          # Baixando ldid direto para evitar erro de pacote não encontrado
-          sudo curl -L https://github.com/theos/ldid/releases/latest/download/ldid_linux_x86_64 -o /usr/local/bin/ldid
-          sudo chmod +x /usr/local/bin/ldid
+          
+          # Baixando ldid via Git para não ser bloqueado pelo sistema
+          git clone https://github.com/theos/ldid.git ~/ldid_source
+          cd ~/ldid_source && make -j$(nproc)
+          sudo cp ldid /usr/local/bin/
 
-      - name: Setup Theos e PATH (O que seu amigo indicou)
+      - name: Setup Theos e PATH
         run: |
           git clone --recursive https://github.com/theos/theos.git ~/theos
-          # Isso ensina o sistema onde estão o clang e o logos:
           echo "THEOS=$HOME/theos" >> $GITHUB_ENV
           echo "$HOME/theos/bin" >> $GITHUB_PATH
 
-      - name: Clonar SDK (Adeus Erro 295k)
+      - name: Clonar SDK (Bypass 295k)
         run: |
           mkdir -p ~/theos/sdks
-          # Usar git clone é a única forma de fugir do erro de 295k do curl
+          # Clonar direto do repo oficial evita o arquivo corrompido de 295k
           git clone --depth 1 https://github.com/theos/sdks.git ~/temp_sdks
           cp -r ~/temp_sdks/iPhoneOS14.5.sdk ~/theos/sdks/
           rm -rf ~/temp_sdks
 
       - name: Compilar Space Xit V4
         run: |
+          # Limpeza de texto para evitar erro de caractere do Windows
           find . -type f -exec sed -i 's/\r$//' {} +
           make clean package FINALPACKAGE=1
 
-      - name: Upload V4
+      - name: Download do Produto
         uses: actions/upload-artifact@v4
         with:
           name: SpaceXit_V4_Final
