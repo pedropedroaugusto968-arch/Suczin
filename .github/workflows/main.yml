@@ -1,4 +1,4 @@
-name: Build_SpaceXit_V4_Final
+name: Space_V4_Build
 on: [push, workflow_dispatch]
 jobs:
   build:
@@ -6,31 +6,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Instalar Dependências do Sistema
+      - name: Instalar Ferramentas
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential git lua5.3 liblua5.3-dev dpkg-dev
-          # Instala o ldid para assinar o binário
-          sudo curl -L https://github.com/theos/ldid/releases/latest/download/ldid_linux_x86_64 -o /usr/local/bin/ldid
-          sudo chmod +x /usr/local/bin/ldid
+          sudo apt-get install -y build-essential git lua5.3 liblua5.3-dev dpkg-dev ldid
 
       - name: Setup Theos e PATH
         run: |
           git clone --recursive https://github.com/theos/theos.git ~/theos
-          # CONFIGURAÇÃO DO PATH: Isso resolve o erro do seu amigo
           echo "THEOS=$HOME/theos" >> $GITHUB_ENV
           echo "$HOME/theos/bin" >> $GITHUB_PATH
 
-      - name: Clonar SDK (Bypass Erro 295k)
+      - name: Clonar SDK (Bypass 295k)
         run: |
           mkdir -p ~/theos/sdks
+          # Usamos o Git Clone direto para não baixar os 295k de erro
           git clone --depth 1 https://github.com/theos/sdks.git ~/temp_sdks
           cp -r ~/temp_sdks/iPhoneOS14.5.sdk ~/theos/sdks/
           rm -rf ~/temp_sdks
 
       - name: Compilar Space Xit V4
         run: |
-          # Agora o sistema já reconhece o 'make' e o 'logos' automaticamente
           find . -type f -exec sed -i 's/\r$//' {} +
           make clean package FINALPACKAGE=1
 
