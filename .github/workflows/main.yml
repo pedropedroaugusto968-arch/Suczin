@@ -1,5 +1,4 @@
-name: Build Space Xit V4 Final
-
+name: Build_SpaceXit_V4
 on:
   push:
     branches: [ main ]
@@ -8,37 +7,28 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Código
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Instalar Theos e SDK
+      - name: Setup Theos
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential git lua5.3 liblua5.3-dev libarchive-dev python3
-          # Instalando Theos
+          sudo apt-get install -y build-essential git lua5.3 liblua5.3-dev
           git clone --recursive https://github.com/theos/theos.git ~/theos
-          # Baixando apenas o SDK 14.5 (Leve e Rápido)
+          curl -kL "https://github.com/theos/sdks/raw/master/iPhoneOS14.5.sdk.tar.xz" -o ~/sdk.tar.xz
           mkdir -p ~/theos/sdks
-          git clone --depth 1 https://github.com/theos/sdks.git ~/temp_sdks
-          mv ~/temp_sdks/iPhoneOS14.5.sdk ~/theos/sdks/
-          rm -rf ~/temp_sdks
+          tar -xf ~/sdk.tar.xz -C ~/theos/sdks/
 
-      - name: Limpar Formato (Anti-Erro 25)
-        run: |
-          find . -type f -exec sed -i 's/\r$//' {} +
-          echo "" >> control
-
-      - name: Compilar Space Xit V4
+      - name: Compile
         run: |
           export THEOS=~/theos
           export PATH=$THEOS/bin:$PATH
+          find . -type f -exec sed -i 's/\r$//' {} +
           make clean
           make package FINALPACKAGE=1
 
-      - name: Entrega do Arquivo
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SpaceXit_V4_Final
+          name: SpaceXit_V4_Release
           path: packages/*.deb
