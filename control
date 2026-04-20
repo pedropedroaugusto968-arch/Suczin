@@ -1,9 +1,8 @@
-Package: com.spacexit.v4
-Name: Space Xit V4 VIP
+Package: com.spacexit.v4final
+Name: Space Xit V4
 Depends: mobilesubstrate
-Version: 4.0.0
+Version: 4.0
 Architecture: iphoneos-arm
-Description: Menu VIP V4 Profissional.
-Maintainer: Gomes (@eoo_gomes3)
-Author: Space Xit
-
+Description: Versao Final Space Xit
+Maintainer: Gomes
+Author: Gomes
